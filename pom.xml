@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.mgdonlinestore</groupId>
+    <artifactId>MG-Management-System</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>pos</module>
+        <module>inventory</module>
+        <module>vendor</module>
+        <module>mg-common</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <image.path.full></image.path.full>
+        <lombok.version>1.18.22</lombok.version>
+
+        <maven.jkube.plugin.version>1.4.0</maven.jkube.plugin.version>
+        <jkube.build.strategy>jib</jkube.build.strategy>
+        <!-- Spring Boot and Spring Cloud related -->
+        <spring-boot.version>2.4.5</spring-boot.version>
+        <spring-cloud.version>2020.0.1</spring-cloud.version>
+
+        <image.path.full>kelhogary/${project.artifactId}:${project.version}</image.path.full>
+        <base.image.path.full>openjdk:11-jre-slim</base.image.path.full>
+
+        <mg-common.version>1.0-SNAPSHOT</mg-common.version>
+        <jackson.version>2.12.2</jackson.version>
+
+    </properties>
+    <dependencyManagement>
+    <dependencies>
+
+        <dependency>
+            <groupId>com.mgdonlinestore</groupId>
+            <artifactId>mg-common</artifactId>
+            <version>${mg-common.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-websocket</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tomcat.embed</groupId>
+                    <artifactId>tomcat-embed-el</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+    </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <!--Execution section is mandatory to make the jar executable inside the docker image-->
+                    <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.jkube</groupId>
+                    <artifactId>kubernetes-maven-plugin</artifactId>
+                    <version>${maven.jkube.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>resource</goal>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <kubernetesManifest>${project.build.directory}/kubernetes</kubernetesManifest>
+                        <recreate>true</recreate>
+                        <targetDir>${project.parent.build.directory}/generated-kube-configs/${profile}/${project.artifactId}</targetDir>
+                        <images>
+                            <image>
+                                <name>${image.path.full}</name>
+                                <build>
+                                    <from>${base.image.path.full}</from>
+                                    <dockerArchive>${project.artifactId}-${project.version}</dockerArchive>
+                                    <assembly>
+                                        <targetDir>/opt/usr/app</targetDir>
+                                    </assembly>
+                                    <cmd>java -jar
+                                        /opt/usr/app/${project.artifactId}-${project.version}.jar</cmd>
+                                    <tags>
+                                        <tag>${project.version}</tag>
+                                    </tags>
+                                    <ports>
+                                        <port>${port}</port>
+                                    </ports>
+                                </build>
+                            </image>
+                        </images>
+                        <resources>
+                            <labels>
+                                <all>
+                                    <property>
+                                        <name>app</name>
+                                        <value>${project.artifactId}</value>
+                                    </property>
+                                    <property>
+                                        <name>version</name>
+                                        <value>${project.version}</value>
+                                    </property>
+                                </all>
+                            </labels>
+                            <configMap>
+                                <name>${project.artifactId}</name>
+                                <entries>
+                                    <entry>
+                                        <file>${project.basedir}/src/main/resources/application-${profile}.properties</file>
+                                    </entry>
+                                </entries>
+                            </configMap>
+                        </resources>
+                        <enricher>
+                            <excludes>
+                                <exclude>jkube-maven-issue-mgmt</exclude>
+                                <exclude>jkube-healthcheck-spring-boot</exclude>
+                            </excludes>
+                        </enricher>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>local-dev</id>
+            <modules>
+                <module>pos</module>
+                <module>inventory</module>
+                <module>vendor</module>
+            </modules>
+        </profile>
+    </profiles>
+
+</project>

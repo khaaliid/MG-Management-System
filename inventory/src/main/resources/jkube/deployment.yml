@@ -1,0 +1,23 @@
+spec:
+  selector:
+    matchLabels:
+      app: ${project.artifactId}
+      version: ${project.version}
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: ${project.artifactId}
+        version: ${project.version}
+    spec:
+      containers:
+        - image: ${image.path.full}
+          imagePullPolicy: Always
+          name: ${project.artifactId}
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: ${profile}
+          ports:
+            - containerPort: ${port}
+              name: http-port
+      serviceAccountName: ${project.artifactId}-sa
