@@ -4,10 +4,11 @@ import com.mgdonlinestore.managementsystem.utils.ToStringUtils;
 import com.mgdonlinestore.managementsystem.vendor.dtos.VendorDto;
 import com.mgdonlinestore.managementsystem.vendor.model.Vendor;
 import com.mgdonlinestore.managementsystem.vendor.services.VendorService;
-import com.mgdonlinestore.managementsystem.vendor.utils.Constants;
+import com.mgdonlinestore.managementsystem.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @CrossOrigin
-@RequestMapping(Constants.BASE_PATH)
+@RequestMapping(Constants.VENDOR_BASE_PATH)
 @RestController
 public class VendorController implements VendorService {
 
@@ -42,6 +43,7 @@ public class VendorController implements VendorService {
 
     @Override
     @GetMapping("/page")
+    @PreAuthorize("hasAnyAuthority('ROLE_super_admin','super_admin','ROLE_ROLE_super_admin')")
     public List<Vendor> getVendors(@RequestParam Integer pageNo, @RequestParam Integer pageSize, @RequestParam String sortBy) {
         log.info("get Vendors with pagination  - pageNo : {}, pageSize : {}, sortBy : {} ", pageNo, pageSize, sortBy);
         return accountService.getVendors(pageNo, pageSize, sortBy);

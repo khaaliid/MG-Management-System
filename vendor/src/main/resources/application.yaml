@@ -1,0 +1,7 @@
+#keycloak:
+#  realm: mg
+#  resource: myclient
+#  auth-server-url: http://localhost:8080/
+#  use-resource-role-mappings: true
+#  credentials:
+#    secret: 0qVO6QkRPwsASVYbxGJry9kCH3tnWn4y

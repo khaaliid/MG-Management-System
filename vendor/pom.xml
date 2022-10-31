@@ -24,6 +24,11 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
@@ -50,11 +55,23 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+        </dependency>
+
+
+        <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
     </dependencies>
 
     <profiles>
         <profile>
-            <id>local-dev</id>
+            <id>local-jkube</id>
             <properties>
                 <profile>local-dev</profile>
             </properties>
@@ -63,6 +80,20 @@
                     <plugin>
                         <groupId>org.eclipse.jkube</groupId>
                         <artifactId>kubernetes-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>local-jar</id>
+            <properties>
+                <profile>local-jar</profile>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
