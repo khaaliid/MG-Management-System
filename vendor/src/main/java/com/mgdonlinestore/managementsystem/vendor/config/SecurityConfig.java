@@ -26,6 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.mgdonlinestore.managementsystem.utils.Constants.APP_BASE;
+
 /**
  * @author Khaled ElGohary
  */
@@ -122,7 +124,7 @@ public class SecurityConfig {
 
         // Limited to API routes (neither actuator nor Swagger-UI)
         final var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/greet/**", configuration);
+        source.registerCorsConfiguration(APP_BASE+"/**", configuration);
 
         return source;
     }
