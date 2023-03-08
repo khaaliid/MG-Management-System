@@ -51,3 +51,28 @@
 ////        System.out.println("result"+find("ab","baab"));//true
 //    }
 //}
+
+
+class Solution {
+    public int maxSubArray(int[] nums) {
+        if (nums.length == 1) return nums[0];
+        int max = nums[0];
+        int tmpMax = nums[1];
+        for (int i = 1; i < nums.length - 1; i += 2) {
+            max += nums[i];
+            tmpMax += nums[i + 1];
+            if (max < tmpMax) {
+                max = tmpMax;
+                i++;
+            }
+        }
+        return max;
+    }
+
+
+    public static void main(String[] args) {
+        new Solution().maxSubArray(new int[] {-2,1,-3,4,-1,2,1,-5,4});
+    }
+
+
+}

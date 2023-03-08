@@ -43,8 +43,8 @@ public class VendorController implements VendorService {
 
     @Override
     @GetMapping("/page")
-    @PreAuthorize("hasAnyAuthority('ROLE_super_admin','super_admin','ROLE_ROLE_super_admin')")
-    public List<Vendor> getVendors(@RequestParam Integer pageNo, @RequestParam Integer pageSize, @RequestParam String sortBy) {
+    @PreAuthorize("hasAnyAuthority('super_admin')")
+    public List<VendorDto> getVendors(@RequestParam Integer pageNo, @RequestParam Integer pageSize, @RequestParam String sortBy) {
         log.info("get Vendors with pagination  - pageNo : {}, pageSize : {}, sortBy : {} ", pageNo, pageSize, sortBy);
         return accountService.getVendors(pageNo, pageSize, sortBy);
     }

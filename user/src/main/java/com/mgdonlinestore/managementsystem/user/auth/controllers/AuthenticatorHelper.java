@@ -8,6 +8,7 @@ import com.mgdonlinestore.managementsystem.user.auth.services.AuthenticatorHelpe
 import com.mgdonlinestore.managementsystem.utils.Constants;
 import com.mgdonlinestore.managementsystem.utils.ToStringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,21 +29,31 @@ public class AuthenticatorHelper implements AuthenticatorHelperI {
 
     private RestTemplate restTemplate;
 
+    @Value("${KEYCLOAK_BASIC_AUTH_HEADER}")
+    private String keyCloackBasicAuthHeader;
+
+    @Value("${KEYCLOAK_TOKEN_URL}")
+    String getTokenUrl;
+
+    @Value("${KEYCLOAK_USER_INFO_URL}")
+    String getUserUrl;
+
     @Override
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthResponse> loginHelper(@RequestBody UserDto userDto) {
-        log.info("authinticate and get the bearer token for user :  {}", ToStringUtils.toString(userDto));
+        log.info("> authinticate and get the bearer token for user :  {}", ToStringUtils.toString(userDto));
+
         restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add("Authorization", "Basic bXljbGllbnQ6MHFWTzZRa1JQd3NBU1ZZYnhHSnJ5OWtDSDN0blduNHk=");
+        headers.add("Authorization", keyCloackBasicAuthHeader);
 
         MultiValueMap<String, String> GetTokenHeadersForm = new LinkedMultiValueMap<>();
         GetTokenHeadersForm.add("username",userDto.getUserName());
         GetTokenHeadersForm.add("password",userDto.getPassword());
         GetTokenHeadersForm.add("grant_type","password");
 
-        String getTokenUrl = "http://localhost:8080/realms/mg/protocol/openid-connect/token";
+
         HttpEntity<MultiValueMap<String, String>> getTokenRequestEntity = new HttpEntity<>(GetTokenHeadersForm, headers);
         ResponseEntity<AuthResponse> response=null;
         try{
@@ -50,7 +61,7 @@ public class AuthenticatorHelper implements AuthenticatorHelperI {
 
             String token = responseObj.getBody().getAccess_token();
             log.debug("Got the token "+token);
-            String getUserUrl = "http://localhost:8080/realms/mg/protocol/openid-connect/userinfo";
+
             headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer "+token);

@@ -9,7 +9,7 @@ public interface VendorService {
     public VendorDto findOrCreateVendor(VendorDto vendorDto);
 
     public  VendorDto[] getVendors(Integer offset);
-    public  List<Vendor> getVendors(Integer pageNo,Integer pageSize, String sortBy);
+    public  List<VendorDto> getVendors(Integer pageNo,Integer pageSize, String sortBy);
     public Boolean deleteVendor(Integer vendorId);
     public VendorDto updateVendor( VendorDto vendorDto);
 }
