@@ -1,15 +1,9 @@
 package com.mgdonlinestore.managementsystem.product.services.impl;
 
-import com.mgdonlinestore.managementsystem.product.daos.ProductPaginationSortingMongoRepo;
 import com.mgdonlinestore.managementsystem.product.daos.impl.ProductDao;
 import com.mgdonlinestore.managementsystem.product.dtos.ProductDto;
-import com.mgdonlinestore.managementsystem.product.model.Product;
 import com.mgdonlinestore.managementsystem.product.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,12 +23,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean deleteProduct(ProductDto product) {
-        return productDao.deleteProduct(product);
+    public boolean deleteProduct(String productId) {
+        return productDao.deleteProduct(productId);
     }
 
     @Override
     public ProductDto addProduct(ProductDto product) {
         return productDao.addProduct(product);
+    }
+
+    @Override
+    public ProductDto findOrCreateProduct(ProductDto product) {
+        return productDao.findOrCreateProduct(product);
+    }
+
+    @Override
+    public ProductDto updateProduct(ProductDto productDto) {
+        return productDao.updateProduct(productDto);
     }
 }

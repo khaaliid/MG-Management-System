@@ -4,6 +4,7 @@ import com.mgdonlinestore.managementsystem.product.daos.ProductPaginationSorting
 import com.mgdonlinestore.managementsystem.product.dtos.ProductDto;
 import com.mgdonlinestore.managementsystem.product.model.Product;
 import com.mgdonlinestore.managementsystem.product.services.ProductService;
+import com.mgdonlinestore.managementsystem.utils.BeanMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,18 +40,18 @@ public class ProductDao implements ProductService {
         List<Product> productModels = productPaginationSortingMongoRepo.findAll(paging).getContent();
 
         productModels.forEach(product -> {
-            products.add( new ProductDto(product.getProductId(), product.getProductName()));
+            products.add( new ProductDto(product.getId(), product.getProductName()));
         });
         return products;
     }
 
     @Override
-    public boolean deleteProduct(ProductDto product) {
+    public boolean deleteProduct(String productId) {
         try {
-            Product productModel = new Product(product.getProductId(), product.getProductName());
-            productPaginationSortingMongoRepo.delete(productModel);
+            Product product = new Product(productId,"");
+            productPaginationSortingMongoRepo.delete(product);
         }catch(Exception ex){
-            log.error("Error during deleting the product {}",product,ex);
+            log.error("Error during deleting the product with ID {}",productId,ex);
             return false;
         }
         return true;
@@ -60,7 +61,25 @@ public class ProductDao implements ProductService {
     public ProductDto addProduct(ProductDto product) {
         Product productModel = new Product(product.getProductId(), product.getProductName());
         productModel = productPaginationSortingMongoRepo.save(productModel);
-        product.setProductId(productModel.getProductId());
+        product.setProductId(productModel.getId());
         return product;
+    }
+
+    @Override
+    public ProductDto findOrCreateProduct(ProductDto product) {
+        Product productModel = null;
+        productModel = productPaginationSortingMongoRepo.findByIdOrProductName(product.getProductId(), product.getProductName());
+        if (productModel == null) {
+            productModel = productPaginationSortingMongoRepo.save(BeanMapper.to(product, Product.class));
+        }
+        return BeanMapper.to(productModel, ProductDto.class);
+    }
+
+    @Override
+    public ProductDto updateProduct(ProductDto productDto) {
+        Product productModel = new Product(productDto.getProductId(), productDto.getProductName());
+        productModel = productPaginationSortingMongoRepo.save(productModel);
+        productDto.setProductId(productModel.getId());
+        return productDto;
     }
 }

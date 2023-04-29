@@ -13,4 +13,5 @@ import org.springframework.stereotype.Repository;
 public interface ProductPaginationSortingMongoRepo extends MongoRepository<Product, Integer> {
 
     public Page<Product> findAll(Pageable page);
+    public Product findByIdOrProductName(String productId, String productName);
 }
