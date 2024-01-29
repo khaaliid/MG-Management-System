@@ -8,7 +8,7 @@ import com.mgdonlinestore.managementsystem.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class VendorController implements VendorService {
 
     @Override
     @GetMapping("/page")
-    @PreAuthorize("hasAnyAuthority('super_admin')")
+//    @PreAuthorize("hasAnyAuthority('super_admin')")
     public List<VendorDto> getVendors(@RequestParam Integer pageNo, @RequestParam Integer pageSize, @RequestParam String sortBy) {
         log.info("get Vendors with pagination  - pageNo : {}, pageSize : {}, sortBy : {} ", pageNo, pageSize, sortBy);
         return accountService.getVendors(pageNo, pageSize, sortBy);
